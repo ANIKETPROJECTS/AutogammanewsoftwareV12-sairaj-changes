@@ -37,7 +37,7 @@ export default function CustomerDetailPage() {
   });
 
   const { data: customerInvoices = [], isLoading: invoicesLoading } = useQuery<Invoice[]>({
-    queryKey: ["/api/invoices", { phone: decodedPhone }],
+    queryKey: [`/api/invoices?phone=${encodeURIComponent(decodedPhone)}`],
     enabled: !!decodedPhone,
   });
 
