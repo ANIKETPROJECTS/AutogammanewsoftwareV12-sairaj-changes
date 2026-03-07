@@ -566,18 +566,11 @@ export default function InvoicePage() {
       }, [] as number[]);
       worksheet["!cols"] = maxWidths.map(w => ({ w: Math.min(w + 2, 50) }));
 
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${businessType.replace(/\s+/g, '_')}_Invoices_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      // Use XLSX.writeFile for better compatibility in modern browsers
+      const fileName = `${businessType.replace(/\s+/g, '_')}_Invoices_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
       
-      console.log("Excel download triggered successfully");
+      console.log("Excel download triggered via writeFile");
       toast({
         title: "Success",
         description: `Excel downloaded for ${businessType}`
