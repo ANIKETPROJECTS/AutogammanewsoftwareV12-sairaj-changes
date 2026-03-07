@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { FileText, Loader2, Search, Trash2, Eye, ArrowUpDown, Printer, Send } from "lucide-react";
+import { FileText, Loader2, Search, Trash2, Eye, ArrowUpDown, Printer, Send, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Input } from "@/components/ui/input";
@@ -500,6 +501,59 @@ export default function InvoicePage() {
     }
   };
 
+  const downloadExcel = (businessType: "Auto Gamma" | "AGNX") => {
+    const businessInvoices = invoices.filter(inv => inv.business === businessType);
+    
+    if (businessInvoices.length === 0) {
+      toast({
+        title: "No data",
+        description: `No invoices found for ${businessType}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const excelData = businessInvoices.map(inv => {
+      const serviceDetails = inv.items.map(item => {
+        let details = item.name;
+        if (item.quantity && item.quantity > 1) details += ` (Qty: ${item.quantity})`;
+        if (item.category) details += ` [Cat: ${item.category}]`;
+        if (item.warranty) details += ` [Warranty: ${item.warranty}]`;
+        return details;
+      }).join(", ");
+
+      return {
+        "Invoice Number": inv.invoiceNo,
+        "Business Category": inv.business,
+        "Customer Name": inv.customerName,
+        "Mobile Number": inv.phoneNumber,
+        "Service Details": serviceDetails,
+        "Grand Total": inv.totalAmount
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Invoices");
+    
+    // Auto-size columns
+    const maxWidths = excelData.reduce((acc, row) => {
+      Object.keys(row).forEach((key, i) => {
+        const value = String(row[key as keyof typeof row]);
+        acc[i] = Math.max(acc[i] || 0, value.length, key.length);
+      });
+      return acc;
+    }, [] as number[]);
+    worksheet["!cols"] = maxWidths.map(w => ({ w: w + 2 }));
+
+    XLSX.writeFile(workbook, `${businessType}_Invoices_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+    
+    toast({
+      title: "Success",
+      description: `Excel downloaded for ${businessType}`
+    });
+  };
+
   const handleSendWhatsApp = async (invoice: Invoice) => {
     const tempDiv = document.createElement('div');
     tempDiv.style.position = 'absolute';
@@ -660,6 +714,27 @@ export default function InvoicePage() {
             </div>
           </div>
           
+          <div className="flex flex-wrap items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => downloadExcel("Auto Gamma")}
+              className="h-10 bg-white border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 gap-2"
+              data-testid="button-download-autogamma"
+            >
+              <Download className="h-4 w-4" />
+              Download Auto Gamma
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => downloadExcel("AGNX")}
+              className="h-10 bg-white border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 gap-2"
+              data-testid="button-download-agnx"
+            >
+              <Download className="h-4 w-4" />
+              Download AGNX
+            </Button>
+          </div>
+
           <div className="w-full md:w-48 space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase">Business Filter</label>
             <Select value={businessFilter} onValueChange={setBusinessFilter}>
