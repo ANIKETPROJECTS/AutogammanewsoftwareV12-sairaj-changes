@@ -546,7 +546,14 @@ export default function InvoicePage() {
     console.log("Mapped Excel data sample:", excelData[0]);
 
     try {
+      // Create worksheet from JSON
       const worksheet = XLSX.utils.json_to_sheet(excelData);
+      
+      // Explicitly set column widths to something reasonable to avoid "invisible" columns
+      // Using a fixed minimum width of 15 and max of 50
+      const headers = Object.keys(excelData[0]);
+      worksheet["!cols"] = headers.map(() => ({ wch: 20 })); 
+
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Invoices");
       
@@ -556,21 +563,12 @@ export default function InvoicePage() {
         throw new Error("Worksheet reference is empty - no data was written");
       }
 
-      // Auto-size columns
-      const maxWidths = excelData.reduce((acc, row) => {
-        Object.keys(row).forEach((key, i) => {
-          const value = String(row[key as keyof typeof row] || "");
-          acc[i] = Math.max(acc[i] || 0, value.length, key.length);
-        });
-        return acc;
-      }, [] as number[]);
-      worksheet["!cols"] = maxWidths.map(w => ({ w: Math.min(w + 2, 50) }));
-
-      // Use XLSX.writeFile for better compatibility in modern browsers
       const fileName = `${businessType.replace(/\s+/g, '_')}_Invoices_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+      
+      // Use writeFile which handles the blob and download automatically
       XLSX.writeFile(workbook, fileName);
       
-      console.log("Excel download triggered via writeFile");
+      console.log("Excel download triggered via writeFile with fixed widths");
       toast({
         title: "Success",
         description: `Excel downloaded for ${businessType}`
