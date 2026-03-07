@@ -117,7 +117,7 @@ export default function AppointmentsPage() {
         const dateB = new Date(`${b.date}T${b.time}`).getTime();
         return sortOrder === "OLDEST" ? dateA - dateB : dateB - dateA;
       });
-  }, [appointments, searchTerm, statusFilter, sortOrder]);
+  }, [appointments, searchTerm, statusFilter, priorityFilter, sortOrder]);
 
   const form = useForm<InsertAppointment>({
     resolver: zodResolver(insertAppointmentSchema),
