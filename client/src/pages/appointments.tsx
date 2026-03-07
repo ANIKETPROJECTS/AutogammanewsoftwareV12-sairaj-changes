@@ -54,6 +54,7 @@ export default function AppointmentsPage() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("SCHEDULED");
+  const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
   const [sortOrder, setSortOrder] = useState<"OLDEST" | "NEWEST">("OLDEST");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
@@ -108,7 +109,8 @@ export default function AppointmentsPage() {
           a.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           a.phone.includes(searchTerm);
         const matchesStatus = statusFilter === "ALL" || a.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesPriority = priorityFilter === "ALL" || a.priority === priorityFilter;
+        return matchesSearch && matchesStatus && matchesPriority;
       })
       .sort((a, b) => {
         const dateA = new Date(`${a.date}T${a.time}`).getTime();
@@ -126,6 +128,7 @@ export default function AppointmentsPage() {
       serviceType: "",
       date: format(new Date(), "yyyy-MM-dd"),
       time: "09:00",
+      priority: "MEDIUM",
     },
   });
 
@@ -146,8 +149,22 @@ export default function AppointmentsPage() {
       serviceType: appointment.serviceType,
       date: appointment.date,
       time: appointment.time,
+      priority: appointment.priority,
     });
     setIsFormOpen(true);
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case "HIGH":
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">HIGH</Badge>;
+      case "MEDIUM":
+        return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">MEDIUM</Badge>;
+      case "LOW":
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">LOW</Badge>;
+      default:
+        return <Badge variant="outline">{priority}</Badge>;
+    }
   };
 
   const getStatusBadge = (status: AppointmentStatus, reason?: string) => {
@@ -198,6 +215,20 @@ export default function AppointmentsPage() {
                 <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                 <SelectItem value="DONE">Done</SelectItem>
                 <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Priority Filter</label>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Priority</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -302,6 +333,28 @@ export default function AppointmentsPage() {
                           <FormControl>
                             <Input placeholder="General Service" {...field} />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="priority"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Priority *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select priority" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="HIGH">High</SelectItem>
+                              <SelectItem value="MEDIUM">Medium</SelectItem>
+                              <SelectItem value="LOW">Low</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -425,6 +478,7 @@ export default function AppointmentsPage() {
                 <TableHead className="text-white font-semibold">Service</TableHead>
                 <TableHead className="text-white font-semibold">Date</TableHead>
                 <TableHead className="text-white font-semibold">Time</TableHead>
+                <TableHead className="text-white font-semibold">Priority</TableHead>
                 <TableHead className="text-white font-semibold">Status</TableHead>
                 <TableHead className="text-white font-semibold text-right">Actions</TableHead>
               </TableRow>
@@ -453,6 +507,7 @@ export default function AppointmentsPage() {
                       {format(parseISO(a.date), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell className="text-slate-600 font-medium">{a.time}</TableCell>
+                    <TableCell>{getPriorityBadge(a.priority)}</TableCell>
                     <TableCell>{getStatusBadge(a.status, a.cancelReason)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

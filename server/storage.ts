@@ -100,6 +100,7 @@ const appointmentSchema = new mongoose.Schema({
   serviceType: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },
+  priority: { type: String, enum: ["HIGH", "MEDIUM", "LOW"], default: "MEDIUM" },
   status: { type: String, enum: ["SCHEDULED", "DONE", "CANCELLED"], default: "SCHEDULED" },
   cancelReason: { type: String },
 });
@@ -633,6 +634,7 @@ export class MongoStorage implements IStorage {
       serviceType: a.serviceType,
       date: a.date,
       time: a.time,
+      priority: a.priority as any,
       status: a.status as any,
       cancelReason: a.cancelReason || undefined
     }));
@@ -649,6 +651,7 @@ export class MongoStorage implements IStorage {
       serviceType: a.serviceType,
       date: a.date,
       time: a.time,
+      priority: a.priority as any,
       status: a.status as any
     };
   }
@@ -664,6 +667,7 @@ export class MongoStorage implements IStorage {
       serviceType: a.serviceType,
       date: a.date,
       time: a.time,
+      priority: a.priority as any,
       status: a.status as any,
       cancelReason: a.cancelReason || undefined
     };

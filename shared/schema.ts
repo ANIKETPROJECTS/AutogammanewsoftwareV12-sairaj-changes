@@ -151,6 +151,9 @@ export type Technician = z.infer<typeof technicianSchema>;
 export const insertTechnicianSchema = technicianSchema.omit({ id: true });
 export type InsertTechnician = z.infer<typeof insertTechnicianSchema>;
 
+export const inquiryPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
+export type InquiryPriority = z.infer<typeof inquiryPrioritySchema>;
+
 // Appointment Schemas
 export const appointmentStatusSchema = z.enum(["SCHEDULED", "DONE", "CANCELLED"]);
 export type AppointmentStatus = z.infer<typeof appointmentStatusSchema>;
@@ -163,6 +166,7 @@ export const appointmentSchema = z.object({
   serviceType: z.string().min(1),
   date: z.string(), // ISO string or YYYY-MM-DD
   time: z.string(), // HH:mm
+  priority: inquiryPrioritySchema.default("MEDIUM"),
   status: appointmentStatusSchema.default("SCHEDULED"),
   cancelReason: z.string().optional(),
 });
@@ -288,9 +292,6 @@ export type InsertTicket = z.infer<typeof insertTicketSchema>;
 
 export const inquiryStatusSchema = z.enum(["NEW", "FOLLOW_UP", "CONVERTED", "LOST"]);
 export type InquiryStatus = z.infer<typeof inquiryStatusSchema>;
-
-export const inquiryPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
-export type InquiryPriority = z.infer<typeof inquiryPrioritySchema>;
 
 export const inquiryItemSchema = z.object({
   serviceId: z.string(),
