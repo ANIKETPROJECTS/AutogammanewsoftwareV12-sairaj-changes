@@ -1460,6 +1460,7 @@ export class MongoStorage implements IStorage {
       ourPrice: (i as any).ourPrice || 0,
       customerPrice: (i as any).customerPrice || 0,
       status: (i as any).status as any,
+      priority: (i as any).priority || "MEDIUM",
       isConverted: (i as any).isConverted || false,
       createdAt: (i as any).createdAt || (i as any).date 
     })) as Inquiry[];
@@ -1487,6 +1488,7 @@ export class MongoStorage implements IStorage {
       ourPrice: (i as any).ourPrice || 0,
       customerPrice: (i as any).customerPrice || 0,
       status: (i as any).status as any,
+      priority: (i as any).priority || "MEDIUM",
       isConverted: false,
       createdAt: (i as any).createdAt || (i as any).date
     };
@@ -1507,6 +1509,7 @@ export class MongoStorage implements IStorage {
       ourPrice: (i as any).ourPrice || 0,
       customerPrice: (i as any).customerPrice || 0,
       status: (i as any).status as any,
+      priority: (i as any).priority || "MEDIUM",
       isConverted: (i as any).isConverted || false,
       createdAt: (i as any).createdAt || (i as any).date
     };

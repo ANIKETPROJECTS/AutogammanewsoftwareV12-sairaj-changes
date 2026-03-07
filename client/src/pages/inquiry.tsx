@@ -255,6 +255,7 @@ Auto Gamma Car Care Studio`;
       customerName: "",
       phone: "",
       email: "",
+      priority: "MEDIUM",
       services: [],
       accessories: [],
       notes: "",
