@@ -66,6 +66,7 @@ export default function InquiryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [priorityFilter, setPriorityFilter] = useState("ALL");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [viewingInquiry, setViewingInquiry] = useState<Inquiry | null>(null);
 
@@ -383,9 +384,10 @@ Auto Gamma Car Care Studio`;
       const matchesStatus = statusFilter === "ALL" || 
                            (statusFilter === "CONVERTED" && i.isConverted) ||
                            (statusFilter === "INQUIRED" && !i.isConverted);
-      return matchesSearch && matchesService && matchesStatus;
+      const matchesPriority = priorityFilter === "ALL" || i.priority === priorityFilter;
+      return matchesSearch && matchesService && matchesStatus && matchesPriority;
     });
-  }, [inquiries, searchTerm, serviceFilter, statusFilter]);
+  }, [inquiries, searchTerm, serviceFilter, statusFilter, priorityFilter]);
 
 
   return (
@@ -425,6 +427,17 @@ Auto Gamma Car Care Studio`;
               <SelectItem value="ALL">All Status</SelectItem>
               <SelectItem value="INQUIRED">Inquired</SelectItem>
               <SelectItem value="CONVERTED">Converted</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+            <SelectTrigger className="w-full md:w-[200px]">
+              <SelectValue placeholder="Filter by Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Priority</SelectItem>
+              <SelectItem value="HIGH">High</SelectItem>
+              <SelectItem value="MEDIUM">Medium</SelectItem>
+              <SelectItem value="LOW">Low</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -483,19 +496,43 @@ Auto Gamma Car Care Studio`;
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Email address (optional)</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="Email address (optional)" {...field} className="h-10" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground">Email address (optional)</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="Email address (optional)" {...field} className="h-10" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground font-bold uppercase">Priority *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value || "MEDIUM"}>
+                              <FormControl>
+                                <SelectTrigger className="h-10">
+                                  <SelectValue placeholder="Select priority" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="HIGH">High</SelectItem>
+                                <SelectItem value="MEDIUM">Medium</SelectItem>
+                                <SelectItem value="LOW">Low</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
 
                   {/* Notes */}
@@ -547,7 +584,18 @@ Auto Gamma Car Care Studio`;
                     <div className="flex-1 space-y-4">
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-slate-400 uppercase">Customer Name</p>
-                        <h3 className="text-lg font-bold text-slate-900">{inquiry.customerName}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-bold text-slate-900">{inquiry.customerName}</h3>
+                          {inquiry.priority && (
+                            <Badge className={
+                              inquiry.priority === "HIGH" ? "bg-red-100 text-red-700 hover:bg-red-100 border-red-200" :
+                              inquiry.priority === "MEDIUM" ? "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200" :
+                              "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                            }>
+                              {inquiry.priority}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">

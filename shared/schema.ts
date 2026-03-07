@@ -289,6 +289,9 @@ export type InsertTicket = z.infer<typeof insertTicketSchema>;
 export const inquiryStatusSchema = z.enum(["NEW", "FOLLOW_UP", "CONVERTED", "LOST"]);
 export type InquiryStatus = z.infer<typeof inquiryStatusSchema>;
 
+export const inquiryPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
+export type InquiryPriority = z.infer<typeof inquiryPrioritySchema>;
+
 export const inquiryItemSchema = z.object({
   serviceId: z.string(),
   serviceName: z.string(),
@@ -318,6 +321,7 @@ export const inquirySchema = z.object({
   ourPrice: z.number().default(0),
   customerPrice: z.number().default(0),
   status: inquiryStatusSchema.default("NEW"),
+  priority: inquiryPrioritySchema.default("MEDIUM"),
   isConverted: z.boolean().default(false),
   createdAt: z.string().default(() => new Date().toISOString()),
 });

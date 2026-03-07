@@ -128,6 +128,8 @@ const inquiryMongoSchema = new mongoose.Schema({
   notes: { type: String },
   ourPrice: { type: Number, default: 0 },
   customerPrice: { type: Number, default: 0 },
+  status: { type: String, enum: ["NEW", "FOLLOW_UP", "CONVERTED", "LOST"], default: "NEW" },
+  priority: { type: String, enum: ["HIGH", "MEDIUM", "LOW"], default: "MEDIUM" },
   date: { type: String, required: true },
   inquiryId: { type: String, required: true },
   isConverted: { type: Boolean, default: false },
