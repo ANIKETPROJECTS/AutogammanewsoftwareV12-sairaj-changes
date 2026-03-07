@@ -799,10 +799,31 @@ export class MongoStorage implements IStorage {
   }
 
   async createJobCard(jobCard: InsertJobCard): Promise<JobCard> {
-    const count = await JobCardModel.countDocuments();
     const year = new Date().getFullYear();
-    const jobNo = `JC-${year}-${(count + 1).toString().padStart(3, "0")}`;
-    
+    let jobNo = jobCard.jobNo;
+
+    if (!jobNo) {
+      const count = await JobCardModel.countDocuments();
+      jobNo = `JC-${year}-${(count + 1).toString().padStart(3, "0")}`;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    while (attempts < maxAttempts) {
+      const existing = await JobCardModel.findOne({ jobNo });
+      if (!existing) break;
+
+      const parts = jobNo.split("-");
+      if (parts.length === 3) {
+        const num = parseInt(parts[2]);
+        jobNo = `JC-${parts[1]}-${(num + 1).toString().padStart(3, "0")}`;
+      } else {
+        jobNo = `${jobNo}-${Math.floor(Math.random() * 1000)}`;
+      }
+      attempts++;
+    }
+
     const j = new JobCardModel({
       ...jobCard,
       jobNo,
