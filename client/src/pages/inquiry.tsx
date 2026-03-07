@@ -585,21 +585,10 @@ Auto Gamma Car Care Studio`;
                     <div className="flex-1 space-y-4">
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-slate-400 uppercase">Customer Name</p>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-slate-900">{inquiry.customerName}</h3>
-                          {inquiry.priority && (
-                            <Badge className={
-                              inquiry.priority === "HIGH" ? "bg-red-100 text-red-700 hover:bg-red-100 border-red-200" :
-                              inquiry.priority === "MEDIUM" ? "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200" :
-                              "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
-                            }>
-                              {inquiry.priority}
-                            </Badge>
-                          )}
-                        </div>
+                        <h3 className="text-lg font-bold text-slate-900">{inquiry.customerName}</h3>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-1">
                           <p className="text-[10px] font-bold text-slate-400 uppercase">Phone Number</p>
                           <p className="text-sm font-medium flex items-center gap-2 text-blue-600">
@@ -611,6 +600,21 @@ Auto Gamma Car Care Studio`;
                           <p className="text-sm font-medium flex items-center gap-2 text-blue-600">
                             <Mail className="h-4 w-4" /> {inquiry.email || "N/A"}
                           </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">Priority Status</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-slate-600">Priority :-</span>
+                            {inquiry.priority && (
+                              <Badge className={
+                                inquiry.priority === "HIGH" ? "bg-red-100 text-red-700 hover:bg-red-100 border-red-200" :
+                                inquiry.priority === "MEDIUM" ? "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200" :
+                                "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                              }>
+                                {inquiry.priority}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
 
